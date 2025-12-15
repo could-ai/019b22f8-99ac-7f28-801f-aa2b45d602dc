@@ -1,123 +1,354 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const KurdistanFlagApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class KurdistanFlagApp extends StatelessWidget {
+  const KurdistanFlagApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Kurdistan Flag Animation',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        useMaterial3: true,
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
+        '/': (context) => const FlagScreen(),
       },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class FlagScreen extends StatefulWidget {
+  const FlagScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<FlagScreen> createState() => _FlagScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _FlagScreenState extends State<FlagScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('ئاڵای کوردستان - ڕۆژی ئاڵا'),
+        centerTitle: true,
+        backgroundColor: Colors.white,
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text('$_counter', style: Theme.of(context).textTheme.headlineMedium),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'پیرۆزبێت ڕۆژی ئاڵای کوردستان',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Arial', 
+                ),
+              ),
+              const SizedBox(height: 40),
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: FlagPainter(animationValue: _controller.value),
+                    size: const Size(350, 230), // Aspect ratio approx 3:2
+                  );
+                },
+              ),
+              const SizedBox(height: 40),
+              const Text(
+                'قوتابخانەی عادیلەخانم',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+class FlagPainter extends CustomPainter {
+  final double animationValue;
+
+  FlagPainter({required this.animationValue});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+    
+    // Flag Colors
+    final redColor = const Color(0xFFEB2323);
+    final whiteColor = Colors.white;
+    final greenColor = const Color(0xFF278E43);
+    final sunColor = const Color(0xFFFEBF10);
+
+    // Wave parameters
+    const waveAmplitude = 10.0;
+    const waveFrequency = 2.5;
+    
+    // We will draw the flag by drawing vertical strips to simulate the wave
+    // This allows the whole image (colors + sun + text) to wave together properly
+    // However, drawing text strip by strip is hard. 
+    // Instead, we will draw the background bands with paths that follow the sine wave.
+    
+    final pathRed = Path();
+    final pathWhite = Path();
+    final pathGreen = Path();
+
+    double bandHeight = size.height / 3;
+
+    // Construct paths for the three bands
+    for (double x = 0; x <= size.width; x++) {
+      // Calculate y offset based on sine wave
+      // Moving the phase with animationValue
+      double yOffset = math.sin((x / size.width * waveFrequency * math.pi) + (animationValue * 2 * math.pi)) * waveAmplitude;
+
+      if (x == 0) {
+        pathRed.moveTo(x, 0 + yOffset);
+        pathWhite.moveTo(x, bandHeight + yOffset);
+        pathGreen.moveTo(x, 2 * bandHeight + yOffset);
+      } else {
+        pathRed.lineTo(x, 0 + yOffset);
+        pathWhite.lineTo(x, bandHeight + yOffset);
+        pathGreen.lineTo(x, 2 * bandHeight + yOffset);
+      }
+    }
+
+    // Close the paths
+    // For Red: Top line is the wave, Bottom line is the wave at bandHeight
+    // Actually, let's build closed shapes.
+    
+    // Re-doing paths to be closed shapes
+    pathRed.reset();
+    pathWhite.reset();
+    pathGreen.reset();
+
+    // Top edge of Red
+    for (double x = 0; x <= size.width; x+=2) {
+      double yOffset = _getWaveOffset(x, size.width);
+      if (x==0) pathRed.moveTo(x, yOffset);
+      else pathRed.lineTo(x, yOffset);
+    }
+    // Bottom edge of Red (which is top of White)
+    for (double x = size.width; x >= 0; x-=2) {
+      double yOffset = _getWaveOffset(x, size.width);
+      pathRed.lineTo(x, bandHeight + yOffset);
+    }
+    pathRed.close();
+
+    // Top edge of White (same as bottom of Red)
+    for (double x = 0; x <= size.width; x+=2) {
+      double yOffset = _getWaveOffset(x, size.width);
+      if (x==0) pathWhite.moveTo(x, bandHeight + yOffset);
+      else pathWhite.lineTo(x, bandHeight + yOffset);
+    }
+    // Bottom edge of White (top of Green)
+    for (double x = size.width; x >= 0; x-=2) {
+      double yOffset = _getWaveOffset(x, size.width);
+      pathWhite.lineTo(x, 2 * bandHeight + yOffset);
+    }
+    pathWhite.close();
+
+    // Top edge of Green
+    for (double x = 0; x <= size.width; x+=2) {
+      double yOffset = _getWaveOffset(x, size.width);
+      if (x==0) pathGreen.moveTo(x, 2 * bandHeight + yOffset);
+      else pathGreen.lineTo(x, 2 * bandHeight + yOffset);
+    }
+    // Bottom edge of Green
+    for (double x = size.width; x >= 0; x-=2) {
+      double yOffset = _getWaveOffset(x, size.width);
+      pathGreen.lineTo(x, 3 * bandHeight + yOffset);
+    }
+    pathGreen.close();
+
+    // Draw Bands
+    paint.color = redColor;
+    canvas.drawPath(pathRed, paint);
+    
+    paint.color = whiteColor;
+    canvas.drawPath(pathWhite, paint);
+    
+    paint.color = greenColor;
+    canvas.drawPath(pathGreen, paint);
+
+    // Draw Sun
+    // The sun should also bob up and down with the wave at the center
+    double centerX = size.width / 2;
+    double centerY = size.height / 2;
+    double centerWaveOffset = _getWaveOffset(centerX, size.width);
+    
+    // Sun position
+    Offset sunCenter = Offset(centerX, centerY + centerWaveOffset);
+    double sunRadius = bandHeight * 0.7; // Sun diameter is usually smaller than white band, but rays extend
+    double coreRadius = sunRadius * 0.5;
+
+    paint.color = sunColor;
+    
+    // Draw Sun Rays
+    int rayCount = 21;
+    double angleStep = (2 * math.pi) / rayCount;
+    // Rotate sun slowly
+    double rotationOffset = animationValue * 2 * math.pi * 0.1; 
+
+    Path sunPath = Path();
+    for (int i = 0; i < rayCount; i++) {
+      double angle = (i * angleStep) - (math.pi / 2) + rotationOffset;
+      
+      // Ray points
+      // We want sharp rays. 
+      // Point 1: on core circle
+      // Point 2: tip of ray
+      // Point 3: on core circle (next step)
+      
+      // Actually, standard star shape logic
+      double rInner = coreRadius;
+      double rOuter = sunRadius;
+      
+      // To make it look like the Kurdish sun (sharp rays)
+      // We need 4 points per ray or just triangle rays
+      // Let's draw the core circle first
+      
+      // Using a simpler star polygon approach
+      // Base of ray on core
+      double angle1 = angle - (angleStep / 4);
+      double angle2 = angle + (angleStep / 4);
+      
+      Offset p1 = Offset(
+        sunCenter.dx + math.cos(angle1) * rInner,
+        sunCenter.dy + math.sin(angle1) * rInner,
+      );
+      Offset tip = Offset(
+        sunCenter.dx + math.cos(angle) * rOuter,
+        sunCenter.dy + math.sin(angle) * rOuter,
+      );
+      Offset p2 = Offset(
+        sunCenter.dx + math.cos(angle2) * rInner,
+        sunCenter.dy + math.sin(angle2) * rInner,
+      );
+
+      Path rayPath = Path();
+      rayPath.moveTo(p1.dx, p1.dy);
+      rayPath.lineTo(tip.dx, tip.dy);
+      rayPath.lineTo(p2.dx, p2.dy);
+      rayPath.close();
+      canvas.drawPath(rayPath, paint);
+    }
+    
+    // Draw Core Sun
+    canvas.drawCircle(sunCenter, coreRadius, paint);
+
+    // Draw Text
+    // "قوتابخانەی عادیلەخانم" on top (Red area)
+    // "ڕۆژی ئاڵا" on bottom (Green area)
+    // We need to position them so they follow the wave roughly
+    
+    _drawText(
+      canvas, 
+      "قوتابخانەی عادیلەخانم", 
+      Offset(centerX, bandHeight * 0.5 + _getWaveOffset(centerX, size.width)), 
+      Colors.white,
+      size.width * 0.07
+    );
+
+    _drawText(
+      canvas, 
+      "ڕۆژی ئاڵا", 
+      Offset(centerX, bandHeight * 2.5 + _getWaveOffset(centerX, size.width)), 
+      Colors.white,
+      size.width * 0.07
+    );
+    
+    // Add a "shine" or shadow overlay to enhance 3D effect
+    // We draw a gradient over the whole flag that moves
+    final gradient = LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [
+        Colors.black.withOpacity(0.0),
+        Colors.black.withOpacity(0.1),
+        Colors.white.withOpacity(0.1),
+        Colors.black.withOpacity(0.1),
+        Colors.black.withOpacity(0.0),
+      ],
+      stops: const [0.0, 0.4, 0.5, 0.6, 1.0],
+      transform: GradientRotation(0), // Can't easily rotate linear gradient in paint without shader
+    );
+    
+    // We simulate the gradient moving by shifting the rect or using a shader
+    // Simple shadow lines based on the derivative of the sine wave would be best but complex
+    // Let's just leave it clean for now.
+  }
+
+  double _getWaveOffset(double x, double width) {
+    const waveAmplitude = 10.0;
+    const waveFrequency = 2.0;
+    return math.sin((x / width * waveFrequency * math.pi) + (animationValue * 2 * math.pi)) * waveAmplitude;
+  }
+
+  void _drawText(Canvas canvas, String text, Offset center, Color color, double fontSize) {
+    final textSpan = TextSpan(
+      text: text,
+      style: TextStyle(
+        color: color,
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        shadows: const [
+          Shadow(blurRadius: 2, color: Colors.black45, offset: Offset(1, 1))
+        ],
+        fontFamily: 'Arial', // Fallback
+      ),
+    );
+    
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.rtl,
+      textAlign: TextAlign.center,
+    );
+    
+    textPainter.layout();
+    
+    // Draw centered at the offset
+    textPainter.paint(
+      canvas, 
+      Offset(center.dx - textPainter.width / 2, center.dy - textPainter.height / 2)
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant FlagPainter oldDelegate) {
+    return oldDelegate.animationValue != animationValue;
   }
 }
